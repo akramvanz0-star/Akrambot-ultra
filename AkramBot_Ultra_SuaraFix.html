@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#090b12">
+<title>AkramBot Ultra</title>
+<style>
+:root{--bg:#090b12;--panel:#111522;--panel2:#191e2e;--line:#292f45;--accent:#a855f7;--accent2:#ec4899;--text:#f4f3ff;--muted:#a5abc2}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#21133d 0,#090b12 52%);color:var(--text);font-family:system-ui,-apple-system,Arial,sans-serif}
+.app{max-width:520px;height:100dvh;min-height:500px;margin:auto;display:flex;flex-direction:column;background:rgba(9,11,18,.94);border-inline:1px solid var(--line)}
+header{display:flex;align-items:center;gap:12px;padding:13px 15px;background:#111522;border-bottom:1px solid var(--line)}
+.logo{height:46px;width:46px;border-radius:15px;background:linear-gradient(140deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:23px;font-weight:900;box-shadow:0 0 24px #a855f744}
+.headtxt{flex:1}h1{font-size:17px;margin:0;letter-spacing:.2px}.sub{font-size:12px;color:#6ee7b7;margin-top:3px}
+.headbtn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:11px;padding:9px;font-size:12px}
+#messages{flex:1;overflow:auto;padding:16px 13px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+.welcome{padding:14px;border:1px solid #6540a1;background:linear-gradient(135deg,#23143c,#15182a);border-radius:17px;font-size:14px;line-height:1.5}
+.welcome b{color:#d8b4fe}
+.msg{max-width:88%;padding:11px 13px;border-radius:16px;line-height:1.5;font-size:14px;overflow-wrap:anywhere;white-space:pre-wrap;animation:pop .18s ease}
+@keyframes pop{from{opacity:.2;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+.bot{align-self:flex-start;background:var(--panel2);border:1px solid var(--line);border-bottom-left-radius:5px}.user{align-self:flex-end;background:linear-gradient(135deg,#6d28d9,#a21caf);border-bottom-right-radius:5px}
+.time{font-size:10px;color:var(--muted);text-align:right;margin-top:4px}
+.quick{display:flex;gap:7px;overflow-x:auto;padding:9px 12px;border-top:1px solid var(--line)}
+.quick button,.tools button{flex:none;background:#171b2b;border:1px solid var(--line);color:#ddd6fe;border-radius:18px;padding:8px 11px;font-size:12px}
+.tools{display:flex;gap:7px;overflow-x:auto;padding:0 12px 9px;background:#111522}.tools button{border-radius:10px}
+form{display:flex;gap:8px;padding:10px;background:#111522;border-top:1px solid var(--line);align-items:center}
+#input{flex:1;min-width:0;border:1px solid #343950;outline:0;border-radius:24px;padding:13px 15px;background:#1a1f30;color:white;font-size:14px}
+#input:focus{border-color:var(--accent)}.send,.mic{height:44px;width:44px;border:0;border-radius:50%;color:white;font-size:19px;background:linear-gradient(135deg,var(--accent),var(--accent2));flex:none}
+.mic{background:#292d40;font-size:17px}.mic.on{background:#dc2626}
+.foot{padding:0 10px 8px;background:#111522;text-align:center;color:var(--muted);font-size:10px}
+.settings{position:absolute;inset:0;background:#080a11f5;display:none;z-index:5;padding:20px;overflow:auto}.settings.show{display:block}.settings h2{margin-top:30px}.settingrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 0;border-bottom:1px solid var(--line)}select{background:#191e2e;color:white;border:1px solid var(--line);border-radius:10px;padding:8px}
+</style>
+</head>
+<body><main class="app">
+<header><div class="logo">A</div><div class="headtxt"><h1>AkramBot <span style="color:#d8b4fe">ULTRA</span></h1><div class="sub">● ONLINE DI PERANGKAT • MODE LATIHAN</div></div><button class="headbtn" id="settingsBtn">⚙️</button></header>
+<section id="messages"><div class="welcome"><b>⚡ Selamat datang di AkramBot Ultra!</b><br>Chat santai, bantuan tugas, lelucon, dan suara. Pilih tombol di bawah atau langsung ketik pesanmu, bro! 🔥</div></section>
+<div class="quick">
+<button data-msg="Halo AkramBot">👋 Halo</button><button data-msg="Bantu tugas sekolah">📚 Tugas</button><button data-msg="Kasih lelucon">😂 Lelucon</button><button data-msg="Tips Mobile Legends">🎮 Gaming</button><button data-msg="Buatkan cerita pendek">📖 Cerita</button>
+</div>
+<div class="tools"><button id="voiceToggle">🔊 Suara otomatis: ON</button><button id="testVoice">🗣️ Tes suara</button><button id="clearBtn">🗑️ Chat baru</button><button id="aboutBtn">ℹ️ Tentang</button></div>
+<form id="form"><button class="mic" type="button" id="mic" title="Dikte suara">🎙️</button><input id="input" placeholder="Tulis pesan ke AkramBot..." autocomplete="off"><button class="send" type="submit" aria-label="Kirim">➤</button></form>
+<div class="foot">Mode offline: jawaban otomatis terbatas • AI online perlu API/server</div>
+<section class="settings" id="settings"><button class="headbtn" id="closeSettings">← Kembali</button><h2>Pengaturan AkramBot</h2>
+<div class="settingrow"><span>Suara jawaban</span><button class="headbtn" id="voiceSetting">ON</button></div>
+<div class="settingrow"><span>Kecepatan suara</span><select id="rate"><option value=".85">Pelan</option><option value="1" selected>Normal</option><option value="1.15">Cepat</option></select></div>
+<div class="settingrow"><span>Warna tema</span><select id="theme"><option value="purple">Ungu / Pink</option><option value="red">Merah / Hitam</option><option value="green">Hijau</option><option value="blue">Biru</option></select></div>
+<p style="color:var(--muted);font-size:13px;line-height:1.5">Catatan: ini versi lokal yang bisa berjalan tanpa internet setelah file dibuka. Untuk jawaban AI yang benar-benar luas, diperlukan layanan AI online dan API key yang disimpan dengan aman di server, bukan di file publik.</p>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id), box=$('messages'), input=$('input');
+let voiceOn=true;
+function add(text,who){
+ let wrap=document.createElement('div');wrap.className='msg '+who;
+ let body=document.createElement('div');body.textContent=text;wrap.appendChild(body);
+ if(who==='bot'){
+   let read=document.createElement('button');read.type='button';read.textContent='🔊 Bacakan';
+   read.style.cssText='margin-top:9px;padding:6px 10px;border:1px solid #49415f;border-radius:12px;background:#272039;color:#e9d5ff;font-size:12px';
+   read.addEventListener('click',()=>speak(text,true));wrap.appendChild(read);
+ }
+ box.appendChild(wrap);box.scrollTop=box.scrollHeight
+}
+function botReply(raw){let t=raw.toLowerCase();
+if(/halo|hai|hello|assalamualaikum/.test(t))return 'Wih, halo juga bro! 😎🔥 AkramBot Ultra siap bantu. Mau ngapain hari ini?';
+if(/siapa kamu|namamu|akrambot/.test(t))return 'Aku AkramBot Ultra, chatbot latihan buatanmu! Aku bisa ngobrol sederhana, bantu ide tugas, dan membacakan jawaban.';
+if(/tugas|sekolah|matematika|mtk|ipa|ips|ppkn/.test(t))return 'Gas kirim soal atau foto tugasnya, bro 📚 Aku bantu jelaskan langkah-langkahnya. Untuk jawaban dari AI yang sangat luas, versi ini perlu dihubungkan ke layanan AI online.';
+if(/lelucon|jokes|lucu/.test(t))return 'Kenapa komputer nggak pernah lapar? Karena sudah punya banyak byte! 😂💻';
+if(/mobile legends|gaming|mlbb|push rank|game/.test(t))return 'Mode gamer aktif 🎮🔥 Tips: utamakan objektif, cek minimap, komunikasi dengan tim, dan jangan lupa istirahat. Hero andalanmu siapa?';
+if(/cerita|dongeng/.test(t))return 'Ada seorang gamer bernama Akram yang ingin membuat bot sendiri. Ia belajar sedikit demi sedikit, memperbaiki bug, dan akhirnya berhasil. Pesannya: jago itu bukan langsung bisa, tapi terus mencoba! ⚡';
+if(/cuaca|hujan/.test(t))return 'Aku belum terhubung ke data cuaca langsung. Coba cek aplikasi cuaca di HP untuk informasi terbaru 🌦️';
+if(/jam berapa|waktu sekarang/.test(t))return 'Aku belum terhubung ke jam real-time. Cek jam di bagian atas HP kamu ya.';
+if(/terima kasih|makasih|thanks/.test(t))return 'Sama-sama, bro! 🤝🔥';
+if(/sedih|capek|lelah/.test(t))return 'Wah, semoga keadaanmu membaik ya, bro. Kalau mau, cerita pelan-pelan. Aku bisa menemani ngobrol.';
+if(/bye|dadah|sampai jumpa/.test(t))return 'Dadah, bro! Sampai chat lagi 👋';
+if(/buat|ide/.test(t))return 'Bisa kita coba! Jelaskan sedikit hasil yang kamu mau, nanti aku bantu susun idenya. ✨';
+return 'Hmm, aku belum punya jawaban khusus untuk itu 😅 Aku masih versi offline dengan respons terbatas. Coba tanya soal tugas, gaming, cerita, atau lelucon.';
+}
+function speak(text,manual=false){
+ if(!manual&&!voiceOn)return;
+ if(!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window)){
+   alert('Browser ini belum mendukung suara otomatis. Coba buka file di Chrome terbaru.');return;
+ }
+ const synth=window.speechSynthesis;
+ synth.cancel();
+ const clean=String(text).replace(/[🔥😎😂📚🎮⚡👋🤝✨🌦️💻😅]/g,' ');
+ const utter=new SpeechSynthesisUtterance(clean);
+ utter.lang='id-ID';utter.rate=parseFloat($('rate').value||1);utter.pitch=1;
+ const chooseVoice=()=>{
+   const voices=synth.getVoices();
+   const idVoice=voices.find(v=>/^id(-|_)/i.test(v.lang))||voices.find(v=>/indonesia/i.test(v.name));
+   if(idVoice)utter.voice=idVoice;
+ };
+ chooseVoice();
+ utter.onerror=()=>{console.log('Text-to-speech gagal; periksa layanan suara di Android.')};
+ // Beri waktu singkat agar Android siap menerima antrean suara.
+ setTimeout(()=>{try{chooseVoice();synth.speak(utter);if(synth.paused)synth.resume()}catch(e){alert('Suara gagal dimulai. Periksa pengaturan Text-to-speech Android.')}},120);
+}
+function send(text){text=text.trim();if(!text)return;add(text,'user');input.value='';let r=botReply(text);setTimeout(()=>{add(r,'bot');speak(r)},250)}
+$('form').addEventListener('submit',e=>{e.preventDefault();send(input.value)});
+document.querySelectorAll('[data-msg]').forEach(b=>b.onclick=()=>send(b.dataset.msg));
+$('voiceToggle').onclick=()=>{voiceOn=!voiceOn;$('voiceToggle').textContent='🔊 Suara otomatis: '+(voiceOn?'ON':'OFF');$('voiceSetting').textContent=voiceOn?'ON':'OFF';if(!voiceOn&&'speechSynthesis'in window)window.speechSynthesis.cancel()};
+$('testVoice').onclick=()=>speak('Halo Akram! Tes suara AkramBot berhasil. Gas terus bro!',true);
+$('voiceSetting').onclick=()=>{$('voiceSetting').textContent=voiceOn?'OFF':'ON';voiceOn=!voiceOn;$('voiceToggle').textContent='🔊 Suara otomatis: '+(voiceOn?'ON':'OFF')};
+$('clearBtn').onclick=()=>{box.innerHTML='<div class="welcome"><b>Chat baru dimulai! ⚡</b><br>Ada yang bisa kubantu, bro?</div>';if('speechSynthesis'in window)window.speechSynthesis.cancel()};
+$('aboutBtn').onclick=()=>{add('AkramBot Ultra v2\\nDibuat untuk latihan HTML. Fitur: chat offline, tombol cepat, tema, suara jawaban, dan input suara jika browser mendukung.','bot')};
+$('settingsBtn').onclick=()=>$('settings').classList.add('show');$('closeSettings').onclick=()=>$('settings').classList.remove('show');
+$('theme').onchange=e=>{let themes={purple:['#a855f7','#ec4899'],red:['#ef4444','#991b1b'],green:['#10b981','#047857'],blue:['#3b82f6','#6366f1']};document.documentElement.style.setProperty('--accent',themes[e.target.value][0]);document.documentElement.style.setProperty('--accent2',themes[e.target.value][1])};
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(SR){let rec=new SR();rec.lang='id-ID';rec.interimResults=false;$('mic').onclick=()=>{try{rec.start();$('mic').classList.add('on')}catch(e){}};rec.onresult=e=>{input.value=e.results[0][0].transcript;input.focus()};rec.onend=()=>$('mic').classList.remove('on');rec.onerror=()=>$('mic').classList.remove('on')}else{$('mic').onclick=()=>alert('Input suara belum didukung browser ini. Coba Chrome terbaru.')}
+</script></body></html>
